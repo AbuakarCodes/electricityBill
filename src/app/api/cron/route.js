@@ -1,3 +1,4 @@
+import { BillDownloader } from "@/app/bill/bill-downloader"
 import nodemailer from "nodemailer"
 
 export async function GET() {
@@ -13,12 +14,13 @@ export async function GET() {
     })
 
 
+    let bills = await new BillDownloader().start(["7391516"])
 
     const info = await transporter.sendMail({
       from: "crickrank@gmail.com",
       to: "abubakarzahid895@gmail.com",
-      subject: "Hello from Vercel",
-      text: "Hello! im abubakar",
+      subject: "Sending Bill",
+      text: JSON.stringify(bills),
     })
 
     return Response.json({
