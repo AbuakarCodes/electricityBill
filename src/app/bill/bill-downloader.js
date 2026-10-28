@@ -7,7 +7,7 @@ class BillDownloader {
       const bills = await this.handleLescoBills(ids)
       return bills
     } catch (error) {
-      console.log("Exception caught while fetching LESCO bills at BillDownloader.handleLescoBills")
+      console.log("Exception caught while fetching LESCO bills at BillDownloader.handleLescoBills", error)
       throw error
     }
   }
