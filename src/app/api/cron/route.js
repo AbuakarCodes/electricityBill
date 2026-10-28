@@ -6,6 +6,7 @@ export async function GET() {
     
     const start = performance.now()
     let bills = await new BillDownloader().start(["7391516"])
+    console.log({bills})
     const end = performance.now()
     console.log(`Execution time to fetch bill: ${(end - start).toFixed(2) / 1000} ms`)
 
