@@ -25,15 +25,12 @@ class Lesco {
 
     // Find the account-status form and its required data
     const accountStatusUrlInfo = await this.getAccountStatusUrl(cookies, customerId)
-
-    // Fetch the current account status
-    const accountStatus = await this.getAccountStatus(cookies, accountStatusUrlInfo)
     this.billIdentifier = accountStatusUrlInfo.formDataMap
 
     const billHTML = await this.downloadBill_HTML(cookies, accountStatusUrlInfo?.billDownloadUrl)
-    console.log(Utils.parseBill(billHTML))
-
-    return accountStatus
+    const parsedHTML = Utils.parseBill(billHTML)
+    console.log({ parsedHTML })
+    return parsedHTML
   }
 
   async downloadBill_HTML(cookies, downloadUrl) {
@@ -112,39 +109,6 @@ class Lesco {
       urlObject.pathname = urlObject.pathname.replace(/[^/]+$/, nextPath)
       return urlObject.href
     }
-  }
-
-  async getAccountStatus(cookies, accountStatusUrlInfo) {
-    const status = { dueDate: "", amount: "", owner: "", paid: false, billMonth: "" }
-    await fetch(accountStatusUrlInfo.accountStatusUrl, {
-      method: "post",
-      headers: { cookie: cookies },
-      body: Utils.mapToFormData(accountStatusUrlInfo.formDataMap),
-    })
-      // THE  URl get from (getAccountStatusUrl)
-      .then((response) => response.text())
-      .then(async (response) => {
-        const $ = Cheerio.load(response)
-        const container = $(".AccountStatus")[0]
-        const rows = container.childNodes
-          .filter((x) => x.name == "div" && x.attribs.class?.includes("row"))
-          .flat()
-        const columns = rows
-          .map((row) => [...row.childNodes])
-          .flat()
-          .filter((x) => x.attribs?.class?.includes("col"))
-        status.dueDate = this.getFieldValue("Due Date:", columns)
-        status.amount = this.getFieldValue("Amount Payable Within Due Date:", columns)
-        status.owner = this.getFieldValue("Customer Name:", columns)
-        const paymentDate = this.getFieldValue("Payment Date:", columns)
-        status.paid =
-          paymentDate?.trim() &&
-          paymentDate.toLowerCase() != "n/a" &&
-          paymentDate.toLowerCase() != "na" &&
-          !!paymentDate
-        status.billMonth = this.getFieldValue("Last Bill Month:", columns)
-      })
-    return status
   }
 
   // getAccountStatus
