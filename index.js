@@ -6,3 +6,4 @@ let bills = await new BillDownloader().start(["7391516"])
 
 const end = performance.now()
 console.log(`Execution time: ${(end - start).toFixed(2) / 1000} ms`)
+
